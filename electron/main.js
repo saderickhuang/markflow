@@ -25,7 +25,9 @@ function createWindow() {
     mainWindow.loadURL('http://localhost:3000')
     mainWindow.webContents.openDevTools()
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
+    const indexPath = path.join(__dirname, '../dist/index.html')
+    console.log('Loading:', indexPath)
+    mainWindow.loadFile(indexPath)
   }
 
   // Handle external links
