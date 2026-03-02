@@ -1,8 +1,5 @@
-import { app, BrowserWindow, dialog, Menu, shell } from 'electron'
-import path from 'path'
-import { fileURLToPath } from 'url'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const { app, BrowserWindow, Menu, shell } = require('electron')
+const path = require('path')
 
 // Environment
 const isDev = process.env.NODE_ENV === 'development'
@@ -19,8 +16,10 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+
       preload: path.join(__dirname, 'preload.cjs')
     }
+
   })
 
   // Load the app
@@ -116,6 +115,7 @@ function createMenu() {
         {
           label: '关于 MarkFlow',
           click: () => {
+            const { dialog } = require('electron')
             dialog.showMessageBox({
               type: 'info',
               title: '关于 MarkFlow',
