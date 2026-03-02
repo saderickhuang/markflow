@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "一个受 Typora 启发的 Web 版 Markdown 编辑器",
   "author": "CodePoet (代码诗人)",
+  "main": "electron/main.js",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -61,7 +62,8 @@
       "output": "release"
     },
     "files": [
-      "dist/**/*"
+      "dist/**/*",
+      "electron/**/*"
     ],
     "win": {
       "target": [
