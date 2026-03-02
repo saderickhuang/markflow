@@ -218,9 +218,14 @@ function App() {
   }, [content])
   
   const handleExportHtml = useCallback(() => {
-    const filename = currentFile.replace(/\.md$/, '.html')
-    fileService.download(debouncedContent, filename, 'html')
-  }, [debouncedContent, currentFile])
+    // Get the rendered HTML from the preview container
+    const previewContainer = document.querySelector('.preview-content')
+    if (previewContainer) {
+      const renderedHtml = previewContainer.innerHTML
+      const filename = currentFile.replace(/\.md$/, '.html')
+      fileService.downloadHtml(renderedHtml, filename)
+    }
+  }, [currentFile])
   
   const handleExportPdf = useCallback(() => {
     window.print()
