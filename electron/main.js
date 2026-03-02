@@ -25,12 +25,12 @@ function createWindow() {
     mainWindow.loadURL('http://localhost:3000')
     mainWindow.webContents.openDevTools()
   } else {
-    // In production, find the dist folder regardless of folder structure
-    const appPath = app.getAppPath()
-    const indexPath = path.join(appPath, 'dist', 'index.html')
-    console.log('App path:', appPath)
-    console.log('Loading:', indexPath)
-    mainWindow.loadFile(indexPath)
+    // In production, use __dirname to find the dist folder
+    // In packaged app, __dirname will be app.asar/electron
+    // We need to go up to find dist
+    const distPath = path.join(__dirname, '..', 'dist', 'index.html')
+    console.log('Loading from:', distPath)
+    mainWindow.loadFile(distPath)
   }
 
   // Handle external links
