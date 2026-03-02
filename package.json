@@ -2,14 +2,22 @@
   "name": "markflow",
   "private": true,
   "version": "1.0.0",
+  "description": "一个受 Typora 启发的 Web 版 Markdown 编辑器",
+  "author": "CodePoet (代码诗人)",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:pwa": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "electron:dev": "vite build && electron .",
+    "electron:build": "vite build && electron-builder",
+    "electron:build:win": "vite build && electron-builder --win",
+    "electron:build:mac": "vite build && electron-builder --mac",
+    "electron:build:linux": "vite build && electron-builder --linux"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -36,11 +44,45 @@
     "@vitejs/plugin-react": "^4.2.1",
     "typescript": "^5.3.3",
     "vite": "^5.0.12",
+    "vite-plugin-pwa": "^0.17.5",
     "vitest": "^1.2.2",
     "@testing-library/react": "^14.1.2",
     "jsdom": "^24.0.0",
     "tailwindcss": "^3.4.1",
     "postcss": "^8.4.33",
-    "autoprefixer": "^10.4.17"
+    "autoprefixer": "^10.4.17",
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.markflow.app",
+    "productName": "MarkFlow",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "public/icon.ico"
+    },
+    "mac": {
+      "target": ["dmg"],
+      "icon": "public/icon.icns"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "icon": "public/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }

@@ -20,8 +20,12 @@
 - **主题切换** - 浅色和深色主题
 - **键盘快捷键** - 常用快捷键支持
 - **导出功能** - 支持导出为 HTML 和 PDF
+- **PWA 支持** - 可安装到桌面/手机
+- **Electron 打包** - 桌面应用
 
 ## 快速开始
+
+### Web 版
 
 ```bash
 # 克隆仓库
@@ -38,6 +42,31 @@ npm run dev
 npm run build
 ```
 
+### Electron 桌面版
+
+```bash
+# 克隆仓库
+git clone https://github.com/saderickhuang/markflow.git
+cd markflow
+
+# 安装依赖
+npm install
+
+# 安装 Electron 构建工具
+npm install -D electron electron-builder
+
+# 构建并打包为 Windows 安装包
+npm run electron:build:win
+
+# 或者打包为 macOS
+npm run electron:build:mac
+
+# 或者打包为 Linux
+npm run electron:build:linux
+```
+
+打包完成后，安装包会生成在 `release/` 目录下。
+
 ## 环境要求
 
 - Node.js 18+
@@ -51,6 +80,8 @@ npm run build
 | Ctrl+B | 粗体 |
 | Ctrl+I | 斜体 |
 | Ctrl+K | 插入链接 |
+| Ctrl+N | 新建文件 |
+| Ctrl+O | 打开文件 |
 
 ## 技术栈
 
@@ -61,6 +92,7 @@ npm run build
 - **语法高亮**: react-syntax-highlighter
 - **数学公式**: KaTeX
 - **样式**: Tailwind CSS
+- **桌面打包**: Electron
 
 ## 项目结构
 
@@ -73,12 +105,18 @@ markflow/
 │   │   ├── Toolbar/         # 工具栏组件
 │   │   └── StatusBar/       # 状态栏组件
 │   ├── services/            # 服务层
-│   ├── hooks/               # 自定义 React Hooks
-│   ├── styles/              # 全局样式
-│   ├── App.tsx              # 主应用组件
-│   └── main.tsx             # 入口文件
-├── tests/                   # 测试文件
-├── PLAN.md                  # 项目计划
+│   ├── hooks/              # 自定义 React Hooks
+│   ├── styles/             # 全局样式
+│   ├── App.tsx            # 主应用组件
+│   └── main.tsx           # 入口文件
+├── electron/               # Electron 相关文件
+│   ├── main.js            # 主进程
+│   └── preload.js         # 预加载脚本
+├── public/                # 静态资源
+│   ├── manifest.json       # PWA 配置
+│   └── icon.svg          # 应用图标
+├── tests/                 # 测试文件
+├── PLAN.md                # 项目计划
 └── README.md
 ```
 
@@ -86,9 +124,9 @@ markflow/
 
 - [x] 阶段 1: 项目搭建和基础编辑器
 - [x] 阶段 2: 核心编辑功能
-- [ ] 阶段 3: 高级功能
-- [ ] 阶段 4: UI/UX 优化
-- [ ] 阶段 5: 导出和发布
+- [x] 阶段 3: 高级功能
+- [x] 阶段 4: UI/UX 优化
+- [x] 阶段 5: 发布与部署
 
 ## 测试
 
