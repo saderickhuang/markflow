@@ -17,8 +17,7 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js')
-    },
-    icon: path.join(__dirname, '../public/icon.svg')
+    }
   })
 
   // Load the app
