@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, shell } from 'electron'
+import { app, BrowserWindow, dialog, Menu, shell } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -7,7 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 // Environment
 const isDev = process.env.NODE_ENV === 'development'
 
-let mainWindow: BrowserWindow | null = null
+let mainWindow = null
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -45,7 +45,7 @@ function createWindow() {
 
 // Create application menu
 function createMenu() {
-  const template: Electron.MenuItemConstructorOptions[] = [
+  const template = [
     {
       label: '文件',
       submenu: [
@@ -117,7 +117,6 @@ function createMenu() {
         {
           label: '关于 MarkFlow',
           click: () => {
-            const { dialog } = require('electron')
             dialog.showMessageBox({
               type: 'info',
               title: '关于 MarkFlow',
