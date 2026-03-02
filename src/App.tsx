@@ -62,6 +62,70 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue
 }
 
+// Format helper
+function applyFormat(content: string, format: string): string {
+  const lines = content.split('\n')
+  const lastLineIndex = lines.length - 1
+  const lastLine = lines[lastLineIndex]
+  const cursor = content.length
+  
+  let newContent = content
+  let newCursor = cursor
+  
+  switch (format) {
+    case 'h1':
+      newContent = content + '\n# '
+      newCursor = newContent.length
+      break
+    case 'h2':
+      newContent = content + '\n## '
+      newCursor = newContent.length
+      break
+    case 'h3':
+      newContent = content + '\n### '
+      newCursor = newContent.length
+      break
+    case 'bold':
+      newContent = content + '**bold**'
+      newCursor = content.length + 2
+      break
+    case 'italic':
+      newContent = content + '*italic*'
+      newCursor = content.length + 1
+      break
+    case 'strike':
+      newContent = content + '~~strikethrough~~'
+      newCursor = content.length + 2
+      break
+    case 'link':
+      newContent = content + '[link text](url)'
+      newCursor = content.length + 1
+      break
+    case 'code':
+      newContent = content + '\n```\ncode\n```\n'
+      newCursor = content.length + 5
+      break
+    case 'quote':
+      newContent = content + '\n> quote'
+      newCursor = newContent.length
+      break
+    case 'list':
+      newContent = content + '\n- Item'
+      newCursor = newContent.length
+      break
+    case 'olist':
+      newContent = content + '\n1. Item'
+      newCursor = newContent.length
+      break
+    case 'task':
+      newContent = content + '\n- [ ] Task'
+      newCursor = newContent.length
+      break
+  }
+  
+  return newContent
+}
+
 function App() {
   const [content, setContent] = useState('')
   const [isDarkMode, setIsDarkMode] = useState(false)
@@ -73,6 +137,7 @@ function App() {
   
   const storage = useRef(createStorageService()).current
   const autoSaveTimer = useRef<NodeJS.Timeout | null>(null)
+  const editorRef = useRef<any>(null)
   
   // Debounced content for rendering
   const debouncedContent = useDebounce(content, renderDelay)
@@ -127,6 +192,13 @@ function App() {
   const handleThemeToggle = useCallback(() => {
     setIsDarkMode(prev => !prev)
   }, [])
+  
+  // Handle format
+  const handleFormat = useCallback((format: string) => {
+    const newContent = applyFormat(content, format)
+    setContent(newContent)
+    setIsSaved(false)
+  }, [content])
   
   // File operations
   const handleNew = useCallback(() => {
@@ -209,6 +281,7 @@ function App() {
         onSaveAs={handleSaveAs}
         onExportHtml={handleExportHtml}
         onExportPdf={handleExportPdf}
+        onFormat={handleFormat}
         isSaved={isSaved}
       />
       <div className="flex-1 flex overflow-hidden">

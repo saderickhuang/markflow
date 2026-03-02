@@ -107,3 +107,116 @@ body {
   margin: 1em 0;
   overflow-x: auto;
 }
+
+/* Responsive: Mobile (< 768px) */
+@media (max-width: 768px) {
+  /* Stack editor and preview vertically */
+  .flex-1.flex {
+    flex-direction: column;
+  }
+  
+  .flex-1.flex > div {
+    width: 100% !important;
+    height: 50% !important;
+    border-right: none !important;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .dark .flex-1.flex > div {
+    border-color: #444;
+  }
+  
+  /* Hide some toolbar items on mobile */
+  .hidden-mobile {
+    display: none;
+  }
+  
+  /* Adjust toolbar */
+  .toolbar-compact {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  /* Smaller text */
+  .preview-content {
+    font-size: 14px;
+  }
+  
+  .preview-content h1 { font-size: 1.5em; }
+  .preview-content h2 { font-size: 1.25em; }
+  .preview-content h3 { font-size: 1.1em; }
+}
+
+/* Responsive: Tablet (768px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .preview-content {
+    font-size: 15px;
+  }
+}
+
+/* Print styles for PDF export */
+@media print {
+  body {
+    background: white;
+  }
+  
+  .cm-editor,
+  .toolbar,
+  .status-bar {
+    display: none !important;
+  }
+  
+  .preview-content {
+    padding: 0;
+    max-width: 100%;
+  }
+  
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+}
+
+/* Loading state */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #555;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* Focus styles */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #2196F3;
+  outline-offset: 2px;
+}
+
+/* Transition animations */
+.transition-theme {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}

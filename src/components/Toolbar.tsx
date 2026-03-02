@@ -7,6 +7,7 @@ interface ToolbarProps {
   onSaveAs: () => void
   onExportHtml: () => void
   onExportPdf: () => void
+  onFormat?: (format: string) => void
   isSaved?: boolean
 }
 
@@ -19,8 +20,13 @@ function Toolbar({
   onSaveAs,
   onExportHtml,
   onExportPdf,
+  onFormat,
   isSaved = true
 }: ToolbarProps) {
+  const buttonClass = `px-2 py-1 rounded text-sm transition-colors ${
+    isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'
+  }`
+  
   return (
     <div className={`flex items-center justify-between px-4 py-2 border-b ${
       isDarkMode 
@@ -32,77 +38,75 @@ function Toolbar({
         
         {/* File Operations */}
         <div className="flex items-center gap-1">
-          <button
-            onClick={onNew}
-            className={`px-2 py-1 rounded text-sm transition-colors ${
-              isDarkMode
-                ? 'hover:bg-gray-700'
-                : 'hover:bg-gray-200'
-            }`}
-            title="New (Ctrl+N)"
-          >
+          <button onClick={onNew} className={buttonClass} title="新建 (Ctrl+N)">
             新建
           </button>
-          <button
-            onClick={onOpen}
-            className={`px-2 py-1 rounded text-sm transition-colors ${
-              isDarkMode
-                ? 'hover:bg-gray-700'
-                : 'hover:bg-gray-200'
-            }`}
-            title="Open (Ctrl+O)"
-          >
+          <button onClick={onOpen} className={buttonClass} title="打开 (Ctrl+O)">
             打开
           </button>
-          <button
-            onClick={onSave}
-            className={`px-2 py-1 rounded text-sm transition-colors ${
-              isDarkMode
-                ? 'hover:bg-gray-700'
-                : 'hover:bg-gray-200'
-            }`}
-            title="Save (Ctrl+S)"
-          >
+          <button onClick={onSave} className={buttonClass} title="保存 (Ctrl+S)">
             {isSaved ? '保存' : '保存*'}
           </button>
-          <button
-            onClick={onSaveAs}
-            className={`px-2 py-1 rounded text-sm transition-colors ${
-              isDarkMode
-                ? 'hover:bg-gray-700'
-                : 'hover:bg-gray-200'
-            }`}
-            title="Save As"
-          >
+          <button onClick={onSaveAs} className={buttonClass} title="另存为">
             另存为
           </button>
         </div>
         
         <span className={`mx-2 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>|</span>
         
+        {/* Format Buttons */}
+        {onFormat && (
+          <div className="flex items-center gap-1">
+            <button onClick={() => onFormat('h1')} className={buttonClass} title="标题1">
+              H1
+            </button>
+            <button onClick={() => onFormat('h2')} className={buttonClass} title="标题2">
+              H2
+            </button>
+            <button onClick={() => onFormat('h3')} className={buttonClass} title="标题3">
+              H3
+            </button>
+            <span className={`mx-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>|</span>
+            <button onClick={() => onFormat('bold')} className={buttonClass} title="粗体 (Ctrl+B)">
+              B
+            </button>
+            <button onClick={() => onFormat('italic')} className={buttonClass} title="斜体 (Ctrl+I)">
+              I
+            </button>
+            <button onClick={() => onFormat('strike')} className={buttonClass} title="删除线">
+              S
+            </button>
+            <span className={`mx-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>|</span>
+            <button onClick={() => onFormat('link')} className={buttonClass} title="链接 (Ctrl+K)">
+              🔗
+            </button>
+            <button onClick={() => onFormat('code')} className={buttonClass} title="代码">
+              {'</>'}
+            </button>
+            <button onClick={() => onFormat('quote')} className={buttonClass} title="引用">
+              "
+            </button>
+            <button onClick={() => onFormat('list')} className={buttonClass} title="无序列表">
+              •
+            </button>
+            <button onClick={() => onFormat('olist')} className={buttonClass} title="有序列表">
+              1.
+            </button>
+            <button onClick={() => onFormat('task')} className={buttonClass} title="任务列表">
+              ☐
+            </button>
+          </div>
+        )}
+        
+        <span className={`mx-2 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>|</span>
+        
         {/* Export */}
         <div className="flex items-center gap-1">
-          <button
-            onClick={onExportHtml}
-            className={`px-2 py-1 rounded text-sm transition-colors ${
-              isDarkMode
-                ? 'hover:bg-gray-700'
-                : 'hover:bg-gray-200'
-            }`}
-            title="Export HTML"
-          >
-            导出HTML
+          <button onClick={onExportHtml} className={buttonClass} title="导出HTML">
+            HTML
           </button>
-          <button
-            onClick={onExportPdf}
-            className={`px-2 py-1 rounded text-sm transition-colors ${
-              isDarkMode
-                ? 'hover:bg-gray-700'
-                : 'hover:bg-gray-200'
-            }`}
-            title="Export PDF (Print)"
-          >
-            导出PDF
+          <button onClick={onExportPdf} className={buttonClass} title="导出PDF">
+            PDF
           </button>
         </div>
       </div>
