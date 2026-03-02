@@ -77,15 +77,12 @@ export const createFileService = (): FileService => {
   // 下载文件
   const download = (content: string, filename: string, type: 'html' | 'markdown'): void => {
     let blob: Blob
-    let mimeType: string
     
     if (type === 'html') {
       const htmlContent = wrapHtmlContent(content)
       blob = new Blob([htmlContent], { type: 'text/html' })
-      mimeType = 'text/html'
     } else {
       blob = new Blob([content], { type: 'text/markdown' })
-      mimeType = 'text/markdown'
     }
     
     const url = URL.createObjectURL(blob)
