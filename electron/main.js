@@ -25,7 +25,10 @@ function createWindow() {
     mainWindow.loadURL('http://localhost:3000')
     mainWindow.webContents.openDevTools()
   } else {
-    const indexPath = path.join(__dirname, '../dist/index.html')
+    // In production, find the dist folder regardless of folder structure
+    const appPath = app.getAppPath()
+    const indexPath = path.join(appPath, 'dist', 'index.html')
+    console.log('App path:', appPath)
     console.log('Loading:', indexPath)
     mainWindow.loadFile(indexPath)
   }
