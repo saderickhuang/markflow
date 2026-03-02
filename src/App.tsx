@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Editor from './components/Editor'
 import Preview from './components/Preview'
 import Toolbar from './components/Toolbar'
@@ -46,15 +46,40 @@ function hello() {
 |----------|----------|
 | Cell 1   | Cell 2   |
 
+### Links & Images
+
+[Visit GitHub](https://github.com)
+
 ---
 
 Happy writing! 🚀
 `
 
+// Debounce hook for delayed rendering
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value)
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay)
+
+    return () => {
+      clearTimeout(handler)
+    }
+  }, [value, delay])
+
+  return debouncedValue
+}
+
 function App() {
   const [content, setContent] = useState(DEFAULT_CONTENT)
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [wordCount, setWordCount] = useState(0)
+  const [renderDelay, setRenderDelay] = useState(300) // ms
+
+  // Debounced content for rendering (300ms delay)
+  const debouncedContent = useDebounce(content, renderDelay)
 
   // Calculate word count
   useEffect(() => {
@@ -87,10 +112,10 @@ function App() {
           />
         </div>
         <div className="w-1/2 overflow-auto">
-          <Preview content={content} isDarkMode={isDarkMode} />
+          <Preview content={debouncedContent} isDarkMode={isDarkMode} />
         </div>
       </div>
-      <StatusBar wordCount={wordCount} />
+      <StatusBar wordCount={wordCount} renderDelay={renderDelay} />
     </div>
   )
 }
