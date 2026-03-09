@@ -271,14 +271,14 @@ function App() {
         isSaved={isSaved}
       />
       <div className="flex-1 flex overflow-hidden">
-        <div className="w-1/2 border-r border-gray-300 dark:border-gray-700">
+        <div className="print:hidden w-1/2 border-r border-gray-300 dark:border-gray-700">
           <Editor 
             value={content} 
             onChange={handleContentChange}
             isDarkMode={isDarkMode}
           />
         </div>
-        <div className="w-1/2 overflow-auto">
+        <div className="w-1/2 print:w-full overflow-auto">
           <Preview content={debouncedContent} isDarkMode={isDarkMode} />
         </div>
       </div>

@@ -12,7 +12,7 @@ function StatusBar({
   lastSaved = ''
 }: StatusBarProps) {
   return (
-    <div className="flex items-center justify-between px-4 py-1 text-sm bg-gray-100 border-t border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400">
+    <div className="print:hidden flex items-center justify-between px-4 py-1 text-sm bg-gray-100 border-t border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400">
       <div className="flex items-center gap-4">
         <span className="truncate max-w-[200px]" title={filename}>
           {filename}
