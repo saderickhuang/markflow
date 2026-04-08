@@ -63,24 +63,7 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue
 }
 
-// Format text snippets
-function getFormatText(format: string): string {
-  switch (format) {
-    case 'h1': return '\n# '
-    case 'h2': return '\n## '
-    case 'h3': return '\n### '
-    case 'bold': return '**bold**'
-    case 'italic': return '*italic*'
-    case 'strike': return '~~strikethrough~~'
-    case 'link': return '[link text](url)'
-    case 'code': return '\n```\ncode\n```\n'
-    case 'quote': return '\n> quote'
-    case 'list': return '\n- Item'
-    case 'olist': return '\n1. Item'
-    case 'task': return '\n- [ ] Task'
-    default: return ''
-  }
-}
+
 
 function App() {
   const [content, setContent] = useState('')
@@ -152,11 +135,10 @@ function App() {
     setIsDarkMode(prev => !prev)
   }, [])
   
-  // Handle format - insert at cursor position
+  // Handle format - wrap selected text or insert at cursor
   const handleFormat = useCallback((format: string) => {
-    const text = getFormatText(format)
-    if (text && editorRef.current) {
-      editorRef.current.insertAtCursor(text)
+    if (editorRef.current) {
+      editorRef.current.applyFormat(format)
     }
   }, [])
   

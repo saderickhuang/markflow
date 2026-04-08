@@ -8,6 +8,7 @@ import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 
 export interface EditorHandle {
   insertAtCursor: (text: string) => void
+  applyFormat: (format: string) => void
   scrollToRatio: (ratio: number) => void
 }
 
@@ -16,6 +17,73 @@ interface EditorProps {
   onChange: (value: string) => void
   isDarkMode: boolean
   onScroll?: (ratio: number) => void
+}
+
+// Build format text that wraps selected content or uses placeholder
+function buildFormatText(format: string, selected: string): { text: string; cursorOffset: number } {
+  const s = selected
+  let text: string
+  let cursorOffset: number
+
+  switch (format) {
+    case 'h1':
+      text = `\n# ${s || 'Heading 1'}`
+      cursorOffset = text.length
+      break
+    case 'h2':
+      text = `\n## ${s || 'Heading 2'}`
+      cursorOffset = text.length
+      break
+    case 'h3':
+      text = `\n### ${s || 'Heading 3'}`
+      cursorOffset = text.length
+      break
+    case 'bold':
+      text = `**${s || 'bold'}**`
+      cursorOffset = s ? text.length : text.length - 2
+      break
+    case 'italic':
+      text = `*${s || 'italic'}*`
+      cursorOffset = s ? text.length : text.length - 1
+      break
+    case 'strike':
+      text = `~~${s || 'strikethrough'}~~`
+      cursorOffset = s ? text.length : text.length - 2
+      break
+    case 'link':
+      text = `[${s || 'link text'}](url)`
+      cursorOffset = s ? text.length - 5 : text.length - 1 // place cursor in url area
+      break
+    case 'code':
+      if (s && s.includes('\n')) {
+        text = `\n\`\`\`\n${s}\n\`\`\`\n`
+      } else {
+        text = s ? `\`${s}\`` : `\n\`\`\`\ncode\n\`\`\`\n`
+      }
+      cursorOffset = text.length
+      break
+    case 'quote':
+      text = s ? `\n> ${s}` : `\n> quote`
+      cursorOffset = text.length
+      break
+    case 'list':
+      text = s ? `\n- ${s}` : `\n- Item`
+      cursorOffset = text.length
+      break
+    case 'olist':
+      text = s ? `\n1. ${s}` : `\n1. Item`
+      cursorOffset = text.length
+      break
+    case 'task':
+      text = s ? `\n- [ ] ${s}` : `\n- [ ] Task`
+      cursorOffset = text.length
+      break
+    default:
+      text = s
+      cursorOffset = text.length
+  }
+
+  return { text, cursorOffset }
 }
 
 // Custom keyboard shortcuts
@@ -69,6 +137,18 @@ const Editor = forwardRef<EditorHandle, EditorProps>(function Editor({ value, on
       view.dispatch({
         changes: { from, to, insert: text },
         selection: { anchor: from + text.length }
+      })
+      view.focus()
+    },
+    applyFormat: (format: string) => {
+      const view = cmRef.current?.view
+      if (!view) return
+      const { from, to } = view.state.selection.main
+      const selected = view.state.doc.sliceString(from, to)
+      const { text, cursorOffset } = buildFormatText(format, selected)
+      view.dispatch({
+        changes: { from, to, insert: text },
+        selection: { anchor: from + cursorOffset }
       })
       view.focus()
     },
