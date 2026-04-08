@@ -162,10 +162,32 @@ body {
     padding: 0;
   }
 
+  /* Hide non-print elements (toolbar, statusbar, editor) */
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Make the main container a simple block layout */
+  .h-screen {
+    height: auto !important;
+  }
+
+  .flex-1.flex {
+    display: block !important;
+  }
+
+  /* Preview pane takes full width */
+  .print\:w-full {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
   /* Only show preview content */
   .preview-content {
     display: block !important;
-    max-width: 100%;
+    max-width: 100% !important;
     /* Force dark text for readability in print regardless of theme */
     color: #333 !important;
   }
