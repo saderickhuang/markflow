@@ -248,3 +248,32 @@ input:focus-visible {
 .transition-theme {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* ─── Single Page Editor ─────────────────────────────────── */
+
+.single-page-line {
+  min-height: 1.5em;
+  cursor: text;
+  padding: 1px 0;
+}
+
+.single-page-line-blank {
+  height: 1em;
+}
+
+.single-page-line-input {
+  display: block;
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9em;
+  line-height: 1.7;
+  padding: 2px 0;
+  color: inherit;
+}
+
+.single-page-code-editor {
+  margin: 8px 0;
+}

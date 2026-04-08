@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import DOMPurify from 'dompurify'
 import Editor, { EditorHandle } from './components/Editor'
 import Preview, { PreviewHandle } from './components/Preview'
+import SinglePageEditor from './components/SinglePageEditor'
 import Toolbar from './components/Toolbar'
 import StatusBar from './components/StatusBar'
 import { createStorageService } from './services/storage'
@@ -73,6 +74,7 @@ function App() {
   const [isSaved, setIsSaved] = useState(true)
   const [lastSavedTime, setLastSavedTime] = useState<string>('')
   const [currentFile, setCurrentFile] = useState<string>('未命名.md')
+  const [viewMode, setViewMode] = useState<'split' | 'single'>('split')
   
   const storage = useRef(createStorageService()).current
   const autoSaveTimer = useRef<NodeJS.Timeout | null>(null)
@@ -133,6 +135,11 @@ function App() {
   // Handle theme toggle
   const handleThemeToggle = useCallback(() => {
     setIsDarkMode(prev => !prev)
+  }, [])
+  
+  // Handle view mode toggle
+  const handleViewModeToggle = useCallback(() => {
+    setViewMode(prev => prev === 'split' ? 'single' : 'split')
   }, [])
   
   // Handle format - wrap selected text or insert at cursor
@@ -287,21 +294,33 @@ function App() {
         onExportPdf={handleExportPdf}
         onFormat={handleFormat}
         isSaved={isSaved}
+        viewMode={viewMode}
+        onViewModeToggle={handleViewModeToggle}
       />
-      <div className="flex-1 flex overflow-hidden">
-        <div className="print:hidden w-1/2 border-r border-gray-300 dark:border-gray-700">
-          <Editor 
-            ref={editorRef}
-            value={content} 
+      {viewMode === 'split' ? (
+        <div className="flex-1 flex overflow-hidden">
+          <div className="print:hidden w-1/2 border-r border-gray-300 dark:border-gray-700">
+            <Editor 
+              ref={editorRef}
+              value={content} 
+              onChange={handleContentChange}
+              isDarkMode={isDarkMode}
+              onScroll={handleEditorScroll}
+            />
+          </div>
+          <div className="w-1/2 print:w-full overflow-auto">
+            <Preview ref={previewRef} content={debouncedContent} isDarkMode={isDarkMode} onScroll={handlePreviewScroll} onCheckboxToggle={handleCheckboxToggle} />
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 overflow-hidden">
+          <SinglePageEditor
+            value={content}
             onChange={handleContentChange}
             isDarkMode={isDarkMode}
-            onScroll={handleEditorScroll}
           />
         </div>
-        <div className="w-1/2 print:w-full overflow-auto">
-          <Preview ref={previewRef} content={debouncedContent} isDarkMode={isDarkMode} onScroll={handlePreviewScroll} onCheckboxToggle={handleCheckboxToggle} />
-        </div>
-      </div>
+      )}
       <StatusBar 
         wordCount={wordCount} 
         renderDelay={renderDelay}

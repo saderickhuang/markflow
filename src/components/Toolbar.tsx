@@ -9,6 +9,8 @@ interface ToolbarProps {
   onExportPdf: () => void
   onFormat?: (format: string) => void
   isSaved?: boolean
+  viewMode?: 'split' | 'single'
+  onViewModeToggle?: () => void
 }
 
 function Toolbar({ 
@@ -21,7 +23,9 @@ function Toolbar({
   onExportHtml,
   onExportPdf,
   onFormat,
-  isSaved = true
+  isSaved = true,
+  viewMode = 'split',
+  onViewModeToggle
 }: ToolbarProps) {
   const buttonClass = `px-2 py-1 rounded text-sm transition-colors ${
     isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'
@@ -121,6 +125,19 @@ function Toolbar({
       </div>
       
       <div className="flex items-center gap-2">
+        {onViewModeToggle && (
+          <button
+            onClick={onViewModeToggle}
+            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              isDarkMode
+                ? 'bg-gray-700 hover:bg-gray-600 text-gray-200'
+                : 'bg-white hover:bg-gray-200 text-gray-700 border border-gray-300'
+            }`}
+            title={viewMode === 'split' ? '切换到单页模式' : '切换到分栏模式'}
+          >
+            {viewMode === 'split' ? '📄 单页' : '📰 分栏'}
+          </button>
+        )}
         <button
           onClick={onThemeToggle}
           className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
