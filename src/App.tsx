@@ -227,6 +227,7 @@ function App() {
     api.onMenuSave(handleSave)
     api.onMenuExportHtml(handleExportHtml)
     api.onMenuExportPdf(handleExportPdf)
+    api.onMenuFormat(handleFormat)
 
     return () => {
       api.removeAllListeners('menu-new')
@@ -234,8 +235,9 @@ function App() {
       api.removeAllListeners('menu-save')
       api.removeAllListeners('menu-export-html')
       api.removeAllListeners('menu-export-pdf')
+      api.removeAllListeners('menu-format')
     }
-  }, [handleNew, handleOpen, handleSave, handleExportHtml, handleExportPdf])
+  }, [handleNew, handleOpen, handleSave, handleExportHtml, handleExportPdf, handleFormat])
   
   // Synchronized scrolling between editor and preview
   const handleEditorScroll = useCallback((ratio: number) => {
@@ -258,6 +260,20 @@ function App() {
     }, 50)
   }, [])
   
+  // Toggle checkbox in source markdown
+  const handleCheckboxToggle = useCallback((index: number) => {
+    const checkboxRegex = /- \[([ xX])\]/g
+    let count = 0
+    const newContent = content.replace(checkboxRegex, (match, state) => {
+      if (count++ === index) {
+        return state.trim() ? '- [ ]' : '- [x]'
+      }
+      return match
+    })
+    setContent(newContent)
+    setIsSaved(false)
+  }, [content])
+
   return (
     <div className={`h-screen flex flex-col ${isDarkMode ? 'dark' : ''}`}>
       <Toolbar 
@@ -283,7 +299,7 @@ function App() {
           />
         </div>
         <div className="w-1/2 print:w-full overflow-auto">
-          <Preview ref={previewRef} content={debouncedContent} isDarkMode={isDarkMode} onScroll={handlePreviewScroll} />
+          <Preview ref={previewRef} content={debouncedContent} isDarkMode={isDarkMode} onScroll={handlePreviewScroll} onCheckboxToggle={handleCheckboxToggle} />
         </div>
       </div>
       <StatusBar 

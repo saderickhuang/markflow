@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onMenuSave: (callback) => ipcRenderer.on('menu-save', callback),
   onMenuExportHtml: (callback) => ipcRenderer.on('menu-export-html', callback),
   onMenuExportPdf: (callback) => ipcRenderer.on('menu-export-pdf', callback),
+  onMenuFormat: (callback) => ipcRenderer.on('menu-format', (_event, format) => callback(format)),
   
   // Platform info
   platform: process.platform,

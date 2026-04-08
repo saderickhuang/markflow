@@ -38,6 +38,18 @@ function buildFormatText(format: string, selected: string): { text: string; curs
       text = `\n### ${s || 'Heading 3'}`
       cursorOffset = text.length
       break
+    case 'h4':
+      text = `\n#### ${s || 'Heading 4'}`
+      cursorOffset = text.length
+      break
+    case 'h5':
+      text = `\n##### ${s || 'Heading 5'}`
+      cursorOffset = text.length
+      break
+    case 'h6':
+      text = `\n###### ${s || 'Heading 6'}`
+      cursorOffset = text.length
+      break
     case 'bold':
       text = `**${s || 'bold'}**`
       cursorOffset = s ? text.length : text.length - 2

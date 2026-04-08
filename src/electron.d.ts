@@ -4,6 +4,7 @@ export interface ElectronAPI {
   onMenuSave: (callback: () => void) => void
   onMenuExportHtml: (callback: () => void) => void
   onMenuExportPdf: (callback: () => void) => void
+  onMenuFormat: (callback: (format: string) => void) => void
   platform: string
   removeAllListeners: (channel: string) => void
 }

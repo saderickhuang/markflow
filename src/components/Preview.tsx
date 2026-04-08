@@ -14,12 +14,14 @@ interface PreviewProps {
   content: string
   isDarkMode: boolean
   onScroll?: (ratio: number) => void
+  onCheckboxToggle?: (index: number) => void
 }
 
-const Preview = forwardRef<PreviewHandle, PreviewProps>(function Preview({ content, isDarkMode, onScroll }, ref) {
+const Preview = forwardRef<PreviewHandle, PreviewProps>(function Preview({ content, isDarkMode, onScroll, onCheckboxToggle }, ref) {
   const containerRef = useRef<HTMLDivElement>(null)
   const onScrollRef = useRef(onScroll)
   onScrollRef.current = onScroll
+  const checkboxIndexRef = useRef(0)
 
   useImperativeHandle(ref, () => ({
     scrollToRatio: (ratio: number) => {
@@ -41,6 +43,9 @@ const Preview = forwardRef<PreviewHandle, PreviewProps>(function Preview({ conte
     isDarkMode ? oneDark : oneLight,
     [isDarkMode]
   )
+
+  // Reset checkbox counter before each render
+  checkboxIndexRef.current = 0
 
   return (
     <div ref={containerRef} onScroll={handleScroll} className={`p-4 h-full overflow-auto ${isDarkMode ? 'dark' : ''}`}>
@@ -166,15 +171,16 @@ const Preview = forwardRef<PreviewHandle, PreviewProps>(function Preview({ conte
               )
             },
             
-            // Task list checkbox
+            // Task list checkbox - interactive
             input({ type, checked, ...props }) {
               if (type === 'checkbox') {
+                const index = checkboxIndexRef.current++
                 return (
                   <input 
                     type="checkbox" 
                     checked={checked} 
-                    readOnly 
-                    className="mr-2 h-4 w-4"
+                    onChange={() => onCheckboxToggle?.(index)}
+                    className="mr-2 h-4 w-4 cursor-pointer accent-blue-500"
                     {...props}
                   />
                 )
@@ -183,8 +189,10 @@ const Preview = forwardRef<PreviewHandle, PreviewProps>(function Preview({ conte
             },
             
             // List styling
-            ul({ children, ...props }) {
-              return <ul className="list-disc pl-6 my-2" {...props}>{children}</ul>
+            ul({ children, className, ...props }) {
+              // Task list: remarkGfm adds "contains-task-list" class
+              const isTaskList = className?.includes('contains-task-list')
+              return <ul className={`${isTaskList ? 'list-none pl-4' : 'list-disc pl-6'} my-2`} {...props}>{children}</ul>
             },
             
             ol({ children, ...props }) {
@@ -206,6 +214,18 @@ const Preview = forwardRef<PreviewHandle, PreviewProps>(function Preview({ conte
             
             h3({ children, ...props }) {
               return <h3 className="text-lg font-semibold my-2" {...props}>{children}</h3>
+            },
+            
+            h4({ children, ...props }) {
+              return <h4 className="text-base font-semibold my-2" {...props}>{children}</h4>
+            },
+            
+            h5({ children, ...props }) {
+              return <h5 className="text-sm font-semibold my-1" {...props}>{children}</h5>
+            },
+            
+            h6({ children, ...props }) {
+              return <h6 className="text-sm font-medium my-1 text-gray-500 dark:text-gray-400" {...props}>{children}</h6>
             },
             
             // Paragraph

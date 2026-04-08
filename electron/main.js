@@ -91,6 +91,83 @@ function createMenu() {
       ]
     },
     {
+      label: '格式',
+      submenu: [
+        {
+          label: '标题1',
+          accelerator: 'CmdOrCtrl+1',
+          click: () => mainWindow?.webContents.send('menu-format', 'h1')
+        },
+        {
+          label: '标题2',
+          accelerator: 'CmdOrCtrl+2',
+          click: () => mainWindow?.webContents.send('menu-format', 'h2')
+        },
+        {
+          label: '标题3',
+          accelerator: 'CmdOrCtrl+3',
+          click: () => mainWindow?.webContents.send('menu-format', 'h3')
+        },
+        {
+          label: '标题4',
+          accelerator: 'CmdOrCtrl+4',
+          click: () => mainWindow?.webContents.send('menu-format', 'h4')
+        },
+        {
+          label: '标题5',
+          accelerator: 'CmdOrCtrl+5',
+          click: () => mainWindow?.webContents.send('menu-format', 'h5')
+        },
+        {
+          label: '标题6',
+          accelerator: 'CmdOrCtrl+6',
+          click: () => mainWindow?.webContents.send('menu-format', 'h6')
+        },
+        { type: 'separator' },
+        {
+          label: '粗体',
+          accelerator: 'CmdOrCtrl+B',
+          click: () => mainWindow?.webContents.send('menu-format', 'bold')
+        },
+        {
+          label: '斜体',
+          accelerator: 'CmdOrCtrl+I',
+          click: () => mainWindow?.webContents.send('menu-format', 'italic')
+        },
+        {
+          label: '删除线',
+          click: () => mainWindow?.webContents.send('menu-format', 'strike')
+        },
+        { type: 'separator' },
+        {
+          label: '链接',
+          accelerator: 'CmdOrCtrl+K',
+          click: () => mainWindow?.webContents.send('menu-format', 'link')
+        },
+        {
+          label: '代码',
+          click: () => mainWindow?.webContents.send('menu-format', 'code')
+        },
+        {
+          label: '引用',
+          click: () => mainWindow?.webContents.send('menu-format', 'quote')
+        },
+        { type: 'separator' },
+        {
+          label: '无序列表',
+          click: () => mainWindow?.webContents.send('menu-format', 'list')
+        },
+        {
+          label: '有序列表',
+          click: () => mainWindow?.webContents.send('menu-format', 'olist')
+        },
+        {
+          label: '任务列表',
+          click: () => mainWindow?.webContents.send('menu-format', 'task')
+        }
+      ]
+    },
+    {
       label: '视图',
       submenu: [
         { role: 'reload' },

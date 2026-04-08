@@ -66,6 +66,15 @@ function Toolbar({
             <button onClick={() => onFormat('h3')} className={buttonClass} title="标题3">
               H3
             </button>
+            <button onClick={() => onFormat('h4')} className={buttonClass} title="标题4">
+              H4
+            </button>
+            <button onClick={() => onFormat('h5')} className={buttonClass} title="标题5">
+              H5
+            </button>
+            <button onClick={() => onFormat('h6')} className={buttonClass} title="标题6">
+              H6
+            </button>
             <span className={`mx-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>|</span>
             <button onClick={() => onFormat('bold')} className={buttonClass} title="粗体 (Ctrl+B)">
               B
