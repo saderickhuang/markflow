@@ -20,39 +20,41 @@
     "electron:build:linux": "vite build && electron-builder --linux"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "@codemirror/commands": "^6.3.3",
     "@codemirror/lang-markdown": "^6.2.0",
     "@codemirror/language-data": "^6.3.1",
     "@codemirror/state": "^6.4.0",
     "@codemirror/view": "^6.24.0",
-    "@codemirror/commands": "^6.3.3",
-    "@uiw/react-codemirror": "^4.21.21",
     "@uiw/codemirror-theme-github": "^4.21.21",
-    "react-markdown": "^9.0.1",
-    "remark-gfm": "^4.0.0",
-    "react-syntax-highlighter": "^15.5.0",
+    "@uiw/react-codemirror": "^4.21.21",
+    "dompurify": "^3.3.3",
     "katex": "^0.16.9",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "^9.0.1",
+    "react-syntax-highlighter": "^15.5.0",
     "rehype-katex": "^7.0.0",
+    "remark-gfm": "^4.0.0",
     "remark-math": "^6.0.0"
   },
   "devDependencies": {
+    "@testing-library/react": "^14.1.2",
+    "@types/dompurify": "^3.0.5",
+    "@types/katex": "^0.16.7",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@types/react-syntax-highlighter": "^15.5.11",
-    "@types/katex": "^0.16.7",
     "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.17",
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "jsdom": "^24.0.0",
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3",
     "vite": "^5.0.12",
     "vite-plugin-pwa": "^0.17.5",
-    "vitest": "^1.2.2",
-    "@testing-library/react": "^14.1.2",
-    "jsdom": "^24.0.0",
-    "tailwindcss": "^3.4.1",
-    "postcss": "^8.4.33",
-    "autoprefixer": "^10.4.17",
-    "electron": "^28.1.0",
-    "electron-builder": "^24.9.1"
+    "vitest": "^1.2.2"
   },
   "build": {
     "appId": "com.markflow.app",
@@ -72,15 +74,21 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
     "mac": {
-      "target": ["dmg"]
+      "target": [
+        "dmg"
+      ]
     },
     "linux": {
-      "target": ["AppImage"]
+      "target": [
+        "AppImage"
+      ]
     },
     "nsis": {
       "oneClick": false,

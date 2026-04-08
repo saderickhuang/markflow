@@ -45,34 +45,33 @@ export const createFileService = (): FileService => {
   }
   
   // 另存为
-  const saveAs = (content: string): Promise<string | null> => {
-    return new Promise((resolve) => {
-      const input = document.createElement('input')
-      input.type = 'file'
-      input.accept = '.md'
-      
-      input.onchange = async (e) => {
-        const file = (e.target as HTMLInputElement).files?.[0]
-        if (!file) {
-          resolve(null)
-          return
-        }
-        
-        // 写入文件（如果浏览器支持）
-        try {
-          const writable = await (file as any).createWritable()
-          await writable.write(content)
-          await writable.close()
-          resolve(file.name)
-        } catch {
-          // 不支持则下载
-          download(content, file.name, 'markdown')
-          resolve(file.name)
-        }
+  const saveAs = async (content: string): Promise<string | null> => {
+    // 优先使用 File System Access API
+    if ('showSaveFilePicker' in window) {
+      try {
+        const handle = await (window as any).showSaveFilePicker({
+          suggestedName: 'document.md',
+          types: [{
+            description: 'Markdown Files',
+            accept: { 'text/markdown': ['.md'] }
+          }]
+        })
+        const writable = await handle.createWritable()
+        await writable.write(content)
+        await writable.close()
+        return handle.name
+      } catch (err: any) {
+        // 用户取消了选择
+        if (err?.name === 'AbortError') return null
+        // 其他错误 fallback 到下载
       }
-      
-      input.click()
-    })
+    }
+
+    // Fallback：提示输入文件名后下载
+    const filename = prompt('请输入文件名：', 'document.md')
+    if (!filename) return null
+    download(content, filename, 'markdown')
+    return filename
   }
   
   // 下载 Markdown 文件

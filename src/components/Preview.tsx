@@ -4,21 +4,46 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import { useMemo } from 'react'
+import { useMemo, useRef, useCallback, useImperativeHandle, forwardRef } from 'react'
+
+export interface PreviewHandle {
+  scrollToRatio: (ratio: number) => void
+}
 
 interface PreviewProps {
   content: string
   isDarkMode: boolean
+  onScroll?: (ratio: number) => void
 }
 
-function Preview({ content, isDarkMode }: PreviewProps) {
+const Preview = forwardRef<PreviewHandle, PreviewProps>(function Preview({ content, isDarkMode, onScroll }, ref) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const onScrollRef = useRef(onScroll)
+  onScrollRef.current = onScroll
+
+  useImperativeHandle(ref, () => ({
+    scrollToRatio: (ratio: number) => {
+      const el = containerRef.current
+      if (!el) return
+      el.scrollTop = ratio * (el.scrollHeight - el.clientHeight)
+    }
+  }))
+
+  const handleScroll = useCallback(() => {
+    const el = containerRef.current
+    if (!el) return
+    const maxScroll = el.scrollHeight - el.clientHeight
+    const ratio = maxScroll > 0 ? el.scrollTop / maxScroll : 0
+    onScrollRef.current?.(ratio)
+  }, [])
+
   const style = useMemo(() => 
     isDarkMode ? oneDark : oneLight,
     [isDarkMode]
   )
 
   return (
-    <div className={`p-4 h-full overflow-auto ${isDarkMode ? 'dark' : ''}`}>
+    <div ref={containerRef} onScroll={handleScroll} className={`p-4 h-full overflow-auto ${isDarkMode ? 'dark' : ''}`}>
       <div className={`preview-content max-w-3xl mx-auto ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkMath]}
@@ -199,6 +224,6 @@ function Preview({ content, isDarkMode }: PreviewProps) {
       </div>
     </div>
   )
-}
+})
 
 export default Preview

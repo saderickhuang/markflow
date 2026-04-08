@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import Editor from './components/Editor'
-import Preview from './components/Preview'
+import DOMPurify from 'dompurify'
+import Editor, { EditorHandle } from './components/Editor'
+import Preview, { PreviewHandle } from './components/Preview'
 import Toolbar from './components/Toolbar'
 import StatusBar from './components/StatusBar'
 import { createStorageService } from './services/storage'
@@ -62,50 +63,23 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue
 }
 
-// Format helper
-function applyFormat(content: string, format: string): string {
-  let newContent = content
-  
+// Format text snippets
+function getFormatText(format: string): string {
   switch (format) {
-    case 'h1':
-      newContent = content + '\n# '
-      break
-    case 'h2':
-      newContent = content + '\n## '
-      break
-    case 'h3':
-      newContent = content + '\n### '
-      break
-    case 'bold':
-      newContent = content + '**bold**'
-      break
-    case 'italic':
-      newContent = content + '*italic*'
-      break
-    case 'strike':
-      newContent = content + '~~strikethrough~~'
-      break
-    case 'link':
-      newContent = content + '[link text](url)'
-      break
-    case 'code':
-      newContent = content + '\n```\ncode\n```\n'
-      break
-    case 'quote':
-      newContent = content + '\n> quote'
-      break
-    case 'list':
-      newContent = content + '\n- Item'
-      break
-    case 'olist':
-      newContent = content + '\n1. Item'
-      break
-    case 'task':
-      newContent = content + '\n- [ ] Task'
-      break
+    case 'h1': return '\n# '
+    case 'h2': return '\n## '
+    case 'h3': return '\n### '
+    case 'bold': return '**bold**'
+    case 'italic': return '*italic*'
+    case 'strike': return '~~strikethrough~~'
+    case 'link': return '[link text](url)'
+    case 'code': return '\n```\ncode\n```\n'
+    case 'quote': return '\n> quote'
+    case 'list': return '\n- Item'
+    case 'olist': return '\n1. Item'
+    case 'task': return '\n- [ ] Task'
+    default: return ''
   }
-  
-  return newContent
 }
 
 function App() {
@@ -119,6 +93,10 @@ function App() {
   
   const storage = useRef(createStorageService()).current
   const autoSaveTimer = useRef<NodeJS.Timeout | null>(null)
+  const editorRef = useRef<EditorHandle>(null)
+  const previewRef = useRef<PreviewHandle>(null)
+  const scrollSourceRef = useRef<'editor' | 'preview' | null>(null)
+  const scrollLockTimer = useRef<number>(0)
   
   // Debounced content for rendering
   const debouncedContent = useDebounce(content, renderDelay)
@@ -174,12 +152,13 @@ function App() {
     setIsDarkMode(prev => !prev)
   }, [])
   
-  // Handle format
+  // Handle format - insert at cursor position
   const handleFormat = useCallback((format: string) => {
-    const newContent = applyFormat(content, format)
-    setContent(newContent)
-    setIsSaved(false)
-  }, [content])
+    const text = getFormatText(format)
+    if (text && editorRef.current) {
+      editorRef.current.insertAtCursor(text)
+    }
+  }, [])
   
   // File operations
   const handleNew = useCallback(() => {
@@ -221,7 +200,7 @@ function App() {
     // Get the rendered HTML from the preview container
     const previewContainer = document.querySelector('.preview-content')
     if (previewContainer) {
-      const renderedHtml = previewContainer.innerHTML
+      const renderedHtml = DOMPurify.sanitize(previewContainer.innerHTML)
       const filename = currentFile.replace(/\.md$/, '.html')
       fileService.downloadHtml(renderedHtml, filename)
     }
@@ -256,6 +235,47 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleSave, handleNew, handleOpen])
   
+  // Electron IPC menu event listeners
+  useEffect(() => {
+    const api = window.electronAPI
+    if (!api) return
+
+    api.onMenuNew(handleNew)
+    api.onMenuOpen(handleOpen)
+    api.onMenuSave(handleSave)
+    api.onMenuExportHtml(handleExportHtml)
+    api.onMenuExportPdf(handleExportPdf)
+
+    return () => {
+      api.removeAllListeners('menu-new')
+      api.removeAllListeners('menu-open')
+      api.removeAllListeners('menu-save')
+      api.removeAllListeners('menu-export-html')
+      api.removeAllListeners('menu-export-pdf')
+    }
+  }, [handleNew, handleOpen, handleSave, handleExportHtml, handleExportPdf])
+  
+  // Synchronized scrolling between editor and preview
+  const handleEditorScroll = useCallback((ratio: number) => {
+    if (scrollSourceRef.current === 'preview') return
+    scrollSourceRef.current = 'editor'
+    previewRef.current?.scrollToRatio(ratio)
+    window.clearTimeout(scrollLockTimer.current)
+    scrollLockTimer.current = window.setTimeout(() => {
+      scrollSourceRef.current = null
+    }, 50)
+  }, [])
+
+  const handlePreviewScroll = useCallback((ratio: number) => {
+    if (scrollSourceRef.current === 'editor') return
+    scrollSourceRef.current = 'preview'
+    editorRef.current?.scrollToRatio(ratio)
+    window.clearTimeout(scrollLockTimer.current)
+    scrollLockTimer.current = window.setTimeout(() => {
+      scrollSourceRef.current = null
+    }, 50)
+  }, [])
+  
   return (
     <div className={`h-screen flex flex-col ${isDarkMode ? 'dark' : ''}`}>
       <Toolbar 
@@ -273,13 +293,15 @@ function App() {
       <div className="flex-1 flex overflow-hidden">
         <div className="print:hidden w-1/2 border-r border-gray-300 dark:border-gray-700">
           <Editor 
+            ref={editorRef}
             value={content} 
             onChange={handleContentChange}
             isDarkMode={isDarkMode}
+            onScroll={handleEditorScroll}
           />
         </div>
         <div className="w-1/2 print:w-full overflow-auto">
-          <Preview content={debouncedContent} isDarkMode={isDarkMode} />
+          <Preview ref={previewRef} content={debouncedContent} isDarkMode={isDarkMode} onScroll={handlePreviewScroll} />
         </div>
       </div>
       <StatusBar 

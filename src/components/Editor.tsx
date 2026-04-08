@@ -1,15 +1,21 @@
-import { useCallback, useMemo } from 'react'
-import CodeMirror from '@uiw/react-codemirror'
+import { useCallback, useMemo, useRef, useImperativeHandle, forwardRef } from 'react'
+import CodeMirror, { ReactCodeMirrorRef } from '@uiw/react-codemirror'
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
 import { languages } from '@codemirror/language-data'
 import { EditorView, keymap } from '@codemirror/view'
 import { githubLight, githubDark } from '@uiw/codemirror-theme-github'
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 
+export interface EditorHandle {
+  insertAtCursor: (text: string) => void
+  scrollToRatio: (ratio: number) => void
+}
+
 interface EditorProps {
   value: string
   onChange: (value: string) => void
   isDarkMode: boolean
+  onScroll?: (ratio: number) => void
 }
 
 // Custom keyboard shortcuts
@@ -50,18 +56,54 @@ const customKeymap = EditorView.domEventHandlers({
   }
 })
 
-function Editor({ value, onChange, isDarkMode }: EditorProps) {
+const Editor = forwardRef<EditorHandle, EditorProps>(function Editor({ value, onChange, isDarkMode, onScroll }, ref) {
+  const cmRef = useRef<ReactCodeMirrorRef>(null)
+  const onScrollRef = useRef(onScroll)
+  onScrollRef.current = onScroll
+
+  useImperativeHandle(ref, () => ({
+    insertAtCursor: (text: string) => {
+      const view = cmRef.current?.view
+      if (!view) return
+      const { from, to } = view.state.selection.main
+      view.dispatch({
+        changes: { from, to, insert: text },
+        selection: { anchor: from + text.length }
+      })
+      view.focus()
+    },
+    scrollToRatio: (ratio: number) => {
+      const view = cmRef.current?.view
+      if (!view) return
+      const { scrollHeight, clientHeight } = view.scrollDOM
+      view.scrollDOM.scrollTop = ratio * (scrollHeight - clientHeight)
+    }
+  }))
+
   const handleChange = useCallback((val: string) => {
     onChange(val)
   }, [onChange])
+
+  const scrollListener = useMemo(() =>
+    EditorView.domEventHandlers({
+      scroll: (_event, view) => {
+        const { scrollTop, scrollHeight, clientHeight } = view.scrollDOM
+        const maxScroll = scrollHeight - clientHeight
+        const ratio = maxScroll > 0 ? scrollTop / maxScroll : 0
+        onScrollRef.current?.(ratio)
+        return false
+      }
+    }),
+  [])
 
   const extensions = useMemo(() => [
     markdown({ base: markdownLanguage, codeLanguages: languages }),
     EditorView.lineWrapping,
     history(),
     keymap.of([...defaultKeymap, ...historyKeymap]),
-    customKeymap
-  ], [])
+    customKeymap,
+    scrollListener
+  ], [scrollListener])
 
   const theme = useMemo(() => 
     isDarkMode ? githubDark : githubLight,
@@ -70,6 +112,7 @@ function Editor({ value, onChange, isDarkMode }: EditorProps) {
 
   return (
     <CodeMirror
+      ref={cmRef}
       value={value}
       height="100%"
       theme={theme}
@@ -80,10 +123,10 @@ function Editor({ value, onChange, isDarkMode }: EditorProps) {
         lineNumbers: false,
         foldGutter: false,
         highlightActiveLine: true,
-        history: true,
+        history: false,
       }}
     />
   )
-}
+})
 
 export default Editor
