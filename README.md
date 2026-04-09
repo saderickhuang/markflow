@@ -1,6 +1,6 @@
 # MarkFlow
 
-一个受 Typora 启发的 Web 版 Markdown 编辑器，基于 React 和 CodeMirror 构建。
+一个受 Typora 启发的跨平台 Markdown 编辑器，基于 React 和 CodeMirror 构建。
 
 ![React](https://img.shields.io/badge/React-18-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)

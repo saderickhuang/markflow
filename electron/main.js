@@ -200,7 +200,7 @@ function createMenu() {
               type: 'info',
               title: '关于 MarkFlow',
               message: 'MarkFlow v1.0.0',
-              detail: '一个受 Typora 启发的 Web 版 Markdown 编辑器\n\n由 CodePoet (代码诗人) 开发'
+              detail: '一个受 Typora 启发的 跨平台 Markdown 编辑器\n\nBy SaderickHuang\n\nGitHub: https://github.com/saderickhuang/markflow'
             })
           }
         }
