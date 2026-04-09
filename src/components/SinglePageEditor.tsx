@@ -204,11 +204,55 @@ const LinePreview = memo(function LinePreview({
   )
 })
 
+// ─── Detect line markdown type for styling ────────────────
+
+function getLineStyleClass(content: string): string {
+  const trimmed = content.trimStart()
+  if (/^#{1}\s/.test(trimmed)) return 'spe-input-h1'
+  if (/^#{2}\s/.test(trimmed)) return 'spe-input-h2'
+  if (/^#{3}\s/.test(trimmed)) return 'spe-input-h3'
+  if (/^#{4}\s/.test(trimmed)) return 'spe-input-h4'
+  if (/^#{5}\s/.test(trimmed)) return 'spe-input-h5'
+  if (/^#{6}\s/.test(trimmed)) return 'spe-input-h6'
+  if (/^>\s?/.test(trimmed)) return 'spe-input-quote'
+  if (/^(\*{3,}|-{3,}|_{3,})\s*$/.test(trimmed)) return 'spe-input-hr'
+  return 'spe-input-normal'
+}
+
+// ─── Estimate cursor position from click X offset ─────────
+
+function estimateCursorPos(text: string, clickX: number, containerEl: HTMLElement): number {
+  // Use a hidden canvas to measure text width character by character
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return text.length
+
+  const style = getComputedStyle(containerEl)
+  ctx.font = `${style.fontSize} ${style.fontFamily}`
+
+  const paddingLeft = parseFloat(style.paddingLeft) || 0
+  const x = clickX - paddingLeft
+
+  for (let i = 0; i <= text.length; i++) {
+    const w = ctx.measureText(text.substring(0, i)).width
+    if (w >= x) {
+      // Check if click is closer to i-1 or i
+      if (i > 0) {
+        const prevW = ctx.measureText(text.substring(0, i - 1)).width
+        return (x - prevW < w - x) ? i - 1 : i
+      }
+      return i
+    }
+  }
+  return text.length
+}
+
 // ─── Line Editor (single-line input) ───────────────────────
 
 function LineEditor({
   content,
   cursorPos,
+  styleClass,
   onUpdate,
   onEnter,
   onBackspaceAtStart,
@@ -218,6 +262,7 @@ function LineEditor({
 }: {
   content: string
   cursorPos?: number
+  styleClass: string
   onUpdate: (value: string) => void
   onEnter: (cursorPos: number) => void
   onBackspaceAtStart: () => void
@@ -279,7 +324,7 @@ function LineEditor({
       value={content}
       onChange={e => onUpdate(e.target.value)}
       onKeyDown={handleKeyDown}
-      className="single-page-line-input"
+      className={`single-page-line-input ${styleClass}`}
       spellCheck={false}
     />
   )
@@ -580,13 +625,19 @@ function SinglePageEditor({ value, onChange, isDarkMode }: SinglePageEditorProps
               className="single-page-line"
               onMouseDown={(e) => {
                 e.stopPropagation()
-                if (!isActive) activateLine(el.lineIndex)
+                if (!isActive) {
+                  const rect = e.currentTarget.getBoundingClientRect()
+                  const clickX = e.clientX - rect.left
+                  const pos = estimateCursorPos(el.content, clickX, e.currentTarget)
+                  activateLine(el.lineIndex, pos)
+                }
               }}
             >
               {isActive ? (
                 <LineEditor
                   content={el.content}
                   cursorPos={active.type === 'line' ? active.cursorPos : undefined}
+                  styleClass={getLineStyleClass(el.content)}
                   onUpdate={val => updateLine(el.lineIndex, val)}
                   onEnter={pos => handleLineEnter(el.lineIndex, pos)}
                   onBackspaceAtStart={() => handleBackspaceAtStart(el.lineIndex)}
